@@ -1,0 +1,114 @@
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 647-848-104
+INFO:werkzeug:127.0.0.1 - - [07/Feb/2025 05:29:18] "GET / HTTP/1.1" 200 -
+ERROR:root:Prediction error: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- Bwd_IAT_Mean
+- Bwd_IAT_Min
+- Flow_IAT_Mean
+- Flow_IAT_Min
+- Pkt_Len_Max
+- ...
+Feature names seen at fit time, yet now missing:
+- TotLen_Fwd_Pkts
+
+INFO:werkzeug:127.0.0.1 - - [07/Feb/2025 05:29:33] "[35m[1mPOST /predict HTTP/1.1[0m" 500 -
+ERROR:root:Prediction error: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- Bwd_IAT_Mean
+- Bwd_IAT_Min
+- Flow_IAT_Mean
+- Flow_IAT_Min
+- Pkt_Len_Max
+- ...
+Feature names seen at fit time, yet now missing:
+- TotLen_Fwd_Pkts
+
+INFO:werkzeug:127.0.0.1 - - [07/Feb/2025 05:29:41] "[35m[1mPOST /predict HTTP/1.1[0m" 500 -
+INFO:werkzeug: * Detected change in 'C:\\Users\\User\\anaconda3\\Lib\\site-packages\\plotly\\graph_objects\\__init__.py', reloading
+INFO:werkzeug: * Detected change in 'C:\\Users\\User\\anaconda3\\Lib\\site-packages\\plotly\\subplots.py', reloading
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug: * Restarting with watchdog (windowsapi)
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 647-848-104
+INFO:werkzeug: * Detected change in 'C:\\Users\\User\\anaconda3\\Lib\\functools.py', reloading
+INFO:werkzeug: * Detected change in 'd:\\IoT Network Intrusion Dataset\\app.py', reloading
+INFO:werkzeug: * Detected change in 'd:\\IoT Network Intrusion Dataset\\app.py', reloading
+INFO:werkzeug: * Restarting with watchdog (windowsapi)
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug: * Restarting with watchdog (windowsapi)
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 647-848-104
+ERROR:root:Prediction error: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- Bwd_IAT_Mean
+- Bwd_IAT_Min
+- Flow_IAT_Mean
+- Flow_IAT_Min
+- Pkt_Len_Max
+- ...
+Feature names seen at fit time, yet now missing:
+- Bwd_Pkt_Len_Mean
+- Bwd_Pkt_Len_Min
+- Bwd_Seg_Size_Avg
+- Fwd_Seg_Size_Avg
+- Pkt_Len_Std
+- ...
+
+INFO:werkzeug:127.0.0.1 - - [08/Feb/2025 02:00:04] "[35m[1mPOST /predict HTTP/1.1[0m" 500 -
+ERROR:root:Prediction error: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- Bwd_IAT_Mean
+- Bwd_IAT_Min
+- Flow_IAT_Mean
+- Flow_IAT_Min
+- Pkt_Len_Max
+- ...
+Feature names seen at fit time, yet now missing:
+- Bwd_Pkt_Len_Mean
+- Bwd_Pkt_Len_Min
+- Bwd_Seg_Size_Avg
+- Fwd_Seg_Size_Avg
+- Pkt_Len_Std
+- ...
+
+INFO:werkzeug:127.0.0.1 - - [08/Feb/2025 02:00:12] "[35m[1mPOST /predict HTTP/1.1[0m" 500 -
+INFO:werkzeug: * Detected change in 'C:\\Users\\User\\anaconda3\\Lib\\site-packages\\plotly\\graph_objects\\__init__.py', reloading
+INFO:werkzeug: * Detected change in 'C:\\Users\\User\\anaconda3\\Lib\\site-packages\\plotly\\subplots.py', reloading
+INFO:werkzeug: * Restarting with watchdog (windowsapi)
+INFO:werkzeug: * Restarting with watchdog (windowsapi)
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 647-848-104
+ERROR:root:Prediction error: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- Bwd_IAT_Mean
+- Bwd_IAT_Min
+- Flow_IAT_Mean
+- Flow_IAT_Min
+- Pkt_Len_Max
+- ...
+Feature names seen at fit time, yet now missing:
+- Bwd_Pkt_Len_Mean
+- Bwd_Pkt_Len_Min
+- Bwd_Seg_Size_Avg
+- Fwd_Seg_Size_Avg
+- Pkt_Len_Std
+- ...
+
+INFO:werkzeug:127.0.0.1 - - [08/Feb/2025 02:00:47] "[35m[1mPOST /predict HTTP/1.1[0m" 500 -
+ERROR:root:Prediction error: Object of type Series is not JSON serializable
+INFO:werkzeug:127.0.0.1 - - [08/Feb/2025 02:00:54] "[35m[1mPOST /predict HTTP/1.1[0m" 500 -
+INFO:werkzeug: * Detected change in 'd:\\IoT Network Intrusion Dataset\\app.py', reloading
+INFO:werkzeug: * Detected change in 'd:\\IoT Network Intrusion Dataset\\app.py', reloading
+INFO:werkzeug: * Detected change in 'd:\\IoT Network Intrusion Dataset\\app.py', reloading
+INFO:werkzeug: * Restarting with watchdog (windowsapi)
+INFO:werkzeug: * Restarting with watchdog (windowsapi)
+INFO:werkzeug: * Restarting with watchdog (windowsapi)
+INFO:werkzeug: * Restarting with watchdog (windowsapi)
+INFO:werkzeug: * Restarting with watchdog (windowsapi)
+INFO:werkzeug: * Restarting with watchdog (windowsapi)
+INFO:werkzeug: * Restarting with watchdog (windowsapi)

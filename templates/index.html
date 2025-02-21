@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Network Traffic Analyzer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.27.1/plotly.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #1e88e5;
+            --secondary-color: #42a5f5;
+            --success-color: #2e7d32;
+            --error-color: #c62828;
+            --background-color: #0a1622;
+            --card-background: linear-gradient(135deg, #1a2d3f 0%, #233d5a 100%);
+            --text-color: #ffffff;
+            --border-color: #4a86e8;
+            --table-header-bg: #2d5a8a;
+            --table-hover-bg: #1e3a5f;
+            --badge-glow: rgba(30, 136, 229, 0.8);
+            --accent-glow: rgba(66, 165, 245, 0.6);
+            --form-background: #ffffff;
+            --form-text-color: #333333;
+            --shadow-color: rgba(0, 0, 0, 0.4);
+            --progress-bg: #e0e0e0;
+            --progress-fill: #1e88e5;
+            --header-bg: linear-gradient(135deg, #0a1622 0%, #1e3a5f 70%);
+        }
+
+        body {
+            font-family: "Roboto", "Segoe UI", sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: var(--background-color);
+            color: var(--text-color);
+            position: relative;
+            overflow-x: hidden;
+            line-height: 1.8;
+        }
+
+        .badge-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: var(--header-bg);
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .badge-background::before,
+        .badge-background::after {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 30%;
+            background: radial-gradient(circle, var(--badge-glow) 20%, transparent 90%);
+            animation: float 25s infinite ease-in-out;
+            opacity: 0.8;
+        }
+
+        .badge-background::before {
+            top: 10%;
+            left: 15%;
+            animation-delay: 0s;
+        }
+
+        .badge-background::after {
+            bottom: 10%;
+            right: 15%;
+            animation-delay: 12s;
+            background: radial-gradient(circle, var(--accent-glow) 20%, transparent 90%);
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(66, 165, 245, 0.7);
+            border-radius: 50%;
+            animation: pulse 3s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.5; }
+            100% { transform: scale(1.5); opacity: 0.1; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(80px, -80px) scale(1.2); }
+            50% { transform: translate(-60px, 100px) scale(0.9); }
+            75% { transform: translate(70px, 40px) scale(1.15); }
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 30px;
+            background: var(--card-background);
+            border-radius: 20px;
+            box-shadow: 0 12px 30px var(--shadow-color);
+            position: relative;
+            z-index: 1;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 18px 40px var(--shadow-color);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 30px 25px;
+            border-bottom: 3px solid var(--border-color);
+            position: relative;
+            animation: slideIn 1.2s ease-in-out;
+            background: var(--header-bg);
+            border-radius: 15px 15px 0 0;
+            box-shadow: 0 8px 20px var(--shadow-color);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo-container {
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, rgba(26, 45, 63, 0.9), rgba(35, 61, 90, 0.9));
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px var(--shadow-color);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            display: inline-block;
+        }
+
+        .logo-container:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 24px var(--badge-glow);
+        }
+
+        .logo {
+            width: 350px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            object-fit: contain;
+            border: 3px solid var(--primary-color);
+            box-shadow: 0 6px 18px var(--shadow-color);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 24px var(--badge-glow);
+        }
+
+        .logo-fallback {
+            width: 350px;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #1a2d3f, #233d5a);
+            color: var(--text-color);
+            text-align: center;
+            padding: 20px;
+            border: 3px solid var(--primary-color);
+            box-shadow: 0 6px 18px var(--shadow-color);
+            font-size: 1.5em;
+            font-weight: 600;
+            border-radius: 12px;
+            text-transform: uppercase;
+            animation: pulseText 2s infinite alternate;
+        }
+
+        .logo-fallback::before {
+            content: '📈';
+            font-size: 2.5em;
+            margin-right: 10px;
+        }
+
+        @keyframes pulseText {
+            0% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 3.5em;
+            margin-bottom: 15px;
+            font-weight: 900;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            animation: glow 2s ease-in-out infinite;
+            background: linear-gradient(45deg, #1e88e5, #42a5f5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 4px 8px rgba(30, 136, 229, 0.7); }
+            50% { text-shadow: 0 4px 12px rgba(30, 136, 229, 1); }
+        }
+
+        .header p {
+            color: #b0bec5;
+            font-size: 1.3em;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .input-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+            animation: slideUp 1.2s ease-in-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .file-upload,
+        .manual-input {
+            padding: 30px;
+            background: var(--form-background);
+            border-radius: 18px;
+            box-shadow: 0 6px 20px var(--shadow-color);
+            border: 2px solid var(--border-color);
+            transition: transform 0.4s ease, box-shadow 0.4s ease, background 0.4s ease;
+        }
+
+        .file-upload:hover,
+        .manual-input:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px var(--badge-glow);
+            background: linear-gradient(135deg, #ffffff, #f5f7fa);
+        }
+
+        .file-upload h2,
+        .manual-input h2 {
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            font-size: 2em;
+            font-weight: 700;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            animation: bounce 1.5s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--form-text-color);
+            font-weight: 600;
+            font-size: 1.1em;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="file"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1.1em;
+            background: #f5f5f5;
+            color: var(--form-text-color);
+            transition: border-color 0.4s, box-shadow 0.4s, transform 0.4s;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="file"]:focus,
+        input[type="number"]:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 12px var(--badge-glow), 0 5px 15px var(--shadow-color);
+            transform: translateY(-2px);
+            outline: none;
+        }
+
+        button {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 14px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: 700;
+            transition: transform 0.4s ease, box-shadow 0.4s ease, background 0.4s ease;
+            box-shadow: 0 5px 15px var(--shadow-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: left 0.4s ease;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-6px);
+            box-shadow: 0 8px 25px var(--badge-glow);
+            background: linear-gradient(45deg, #1565c0, #0d47a1);
+        }
+
+        button:hover:not(:disabled)::after {
+            left: 100%;
+        }
+
+        button:disabled {
+            background: linear-gradient(45deg, #757575, #9e9e9e);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        button.processing::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 20px;
+            transform: translateY(-50%);
+            border: 3px solid #fff;
+            border-top: 3px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        button.processing {
+            position: relative;
+            padding-left: 50px;
+        }
+
+        .analysis-section {
+            margin-top: 50px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            animation: fadeInUp 1.2s ease-in-out;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stats-card {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 18px;
+            box-shadow: 0 6px 20px var(--shadow-color);
+            border: 2px solid var(--border-color);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            color: var(--form-text-color);
+        }
+
+        .stats-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px var(--badge-glow);
+        }
+
+        .stats-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            font-size: 2em;
+            font-weight: 700;
+            text-shadow: none;
+        }
+
+        .visualization-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+            animation: slideInLeft 1.2s ease-in-out;
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .chart-container {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 18px;
+            box-shadow: 0 6px 20px var(--shadow-color);
+            border: 2px solid var(--border-color);
+            min-height: 450px;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            color: var(--form-text-color);
+        }
+
+        .chart-container:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px var(--badge-glow);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 40px 0;
+            color: var(--text-color);
+            animation: bounceIn 1.2s ease-in-out;
+        }
+
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0.8); }
+            50% { transform: scale(1.1); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .loading-spinner {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid var(--primary-color);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1.5s linear infinite, pulseSpinner 2s infinite alternate;
+            margin: 0 auto 15px;
+            box-shadow: 0 3px 10px var(--shadow-color);
+        }
+
+        @keyframes pulseSpinner {
+            0% { box-shadow: 0 3px 10px var(--shadow-color); }
+            100% { box-shadow: 0 6px 18px var(--badge-glow); }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: var(--error-color);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(198, 40, 40, 0.1), rgba(198, 40, 40, 0.2));
+            border: 2px solid var(--error-color);
+            box-shadow: 0 6px 20px var(--shadow-color);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            animation: shake 0.8s ease-in-out;
+        }
+
+        .error-message:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 10px 30px rgba(198, 40, 40, 0.3);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .success-message {
+            color: var(--success-color);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(46, 125, 50, 0.1), rgba(46, 125, 50, 0.2));
+            border: 2px solid var(--success-color);
+            box-shadow: 0 6px 20px var(--shadow-color);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            animation: bounceIn 1.2s ease-in-out;
+        }
+
+        .success-message:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 10px 30px rgba(46, 125, 50, 0.3);
+        }
+
+        .table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            background: #ffffff;
+            transition: box-shadow 0.4s ease, transform 0.4s ease;
+            color: var(--form-text-color);
+        }
+
+        .table-container:hover {
+            box-shadow: 0 6px 20px var(--badge-glow);
+            transform: translateY(-4px);
+        }
+
+        .pivot-block {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 15px;
+            animation: fadeIn 1.2s ease-in-out;
+        }
+
+        .feature-row, .result-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .feature-block, .result-block {
+            background: #ffffff;
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            padding: 20px;
+            width: 220px;
+            box-shadow: 0 3px 12px var(--shadow-color);
+            flex: 1;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            color: var(--form-text-color);
+        }
+
+        .feature-block:hover, .result-block:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 6px 20px var(--badge-glow);
+        }
+
+        .feature-block h4, .result-block h4 {
+            color: var(--primary-color);
+            margin: 0 0 15px 0;
+            font-size: 1.2em;
+            font-weight: 700;
+            text-shadow: none;
+        }
+
+        .feature-block p, .result-block p {
+            margin: 10px 0;
+            font-size: 1em;
+            color: var(--form-text-color);
+            text-shadow: none;
+        }
+
+        .feature-block p strong, .result-block p strong {
+            color: var(--form-text-color);
+            font-weight: 600;
+        }
+
+        .table-container::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: #e0e0e0;
+            border-radius: 8px;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 8px;
+            box-shadow: 0 0 6px var(--badge-glow);
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-color);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .progress-container {
+            width: 100%;
+            margin: 20px 0;
+            text-align: center;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 80%;
+            height: 20px;
+            background: var(--progress-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 0 auto;
+            box-shadow: 0 3px 10px var(--shadow-color);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--progress-fill);
+            width: 0%;
+            transition: width 0.3s ease-in-out;
+        }
+
+        .progress-text {
+            color: var(--text-color);
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
+        .manual-input {
+            padding: 30px;
+            background: var(--form-background);
+            border-radius: 18px;
+            box-shadow: 0 6px 20px var(--shadow-color);
+            border: 2px solid var(--border-color);
+            transition: transform 0.4s ease, box-shadow 0.4s ease, background 0.4s ease;
+            display: flex;
+            flex-direction: column; /* Stack children vertically */
+        }
+
+        .manual-input form {
+            display: flex;
+            flex-direction: column; /* Ensure form elements stack vertically */
+            gap: 20px; /* Add spacing between form groups */
+        }
+
+        .manual-input .form-group {
+            margin-bottom: 0; /* Remove default margin to control spacing with gap */
+            width: 100%; /* Ensure full width */
+        }
+
+        .manual-input label {
+            margin-bottom: 8px; /* Reduce margin for tighter spacing */
+        }
+
+        .manual-input input[type="number"] {
+            width: 100%; /* Ensure inputs take full width */
+            max-width: 100%; /* Prevent inputs from expanding beyond container */
+        }
+    </style>
+</head>
+<body>
+    <div class="badge-background">
+        <div class="particles">
+            <script>
+                for (let i = 0; i < 30; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = Math.random() * 100 + 'vw';
+                    particle.style.top = Math.random() * 100 + 'vh';
+                    particle.style.animationDelay = Math.random() * 3 + 's';
+                    document.querySelector('.particles').appendChild(particle);
+                }
+            </script>
+        </div>
+    </div>
+    <div class="container">
+        <div class="header">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Network Traffic Analyzer Logo" class="logo" >
+            </div>
+            <h1>Advanced Network Traffic Analyzer</h1>
+            <p>Analyze network traffic with precision using machine learning models</p>
+        </div>
+
+        <div class="input-section">
+            <div class="file-upload">
+                <h2>File Upload</h2>
+                <form id="uploadForm" enctype="multipart/form-data" action="/predict" method="POST">
+                    <div class="form-group">
+                        <label for="file">Choose CSV File:</label>
+                        <input type="file" id="file" name="file" accept=".csv">
+                    </div>
+                    <button type="submit" id="analyzeFileBtn">Analyze File</button>
+                </form>
+            </div>
+
+            <div class="manual-input">
+                <h2>Manual Input</h2>
+                <form id="manualForm" action="/predict" method="POST">
+                    <div class="form-group">
+                        <label for="src_port">Source Port:</label>
+                        <input type="number" id="src_port" name="src_port" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dst_port">Destination Port:</label>
+                        <input type="number" id="dst_port" name="dst_port" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="protocol">Protocol:</label>
+                        <input type="number" id="protocol" name="protocol" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="flowiatmean">Flow IAT Mean:</label>
+                        <input type="number" id="flowiatmean" name="flowiatmean" step="0.0001" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="flowiatmin">Flow IAT Min:</label>
+                        <input type="number" id="flowiatmin" name="flowiatmin" step="0.0001" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="bwdiatmean">Bwd IAT Mean:</label>
+                        <input type="number" id="bwdiatmean" name="bwdiatmean" step="0.0001" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="bwdiatmin">Bwd IAT Min:</label>
+                        <input type="number" id="bwdiatmin" name="bwdiatmin" step="0.0001" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pktlenmax">Packet Length Max:</label>
+                        <input type="number" id="pktlenmax" name="pktlenmax" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="synflagcnt">SYN Flag Count:</label>
+                        <input type="number" id="synflagcnt" name="synflagcnt" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ackflagcnt">ACK Flag Count:</label>
+                        <input type="number" id="ackflagcnt" name="ackflagcnt" required>
+                    </div>
+                    <button type="submit" id="analyzeDataBtn">Analyze Data</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="loading">
+            <div class="loading-spinner"></div>
+            <p>Analyzing your data...</p>
+        </div>
+
+        <div id="messages"></div>
+
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <p class="progress-text" id="progressText">Rendering Results: 0%</p>
+        </div>
+
+        <div class="results-section" style="display: none;">
+            <div class="analysis-section">
+                <div class="stats-card">
+                    <h3>Prediction Summary</h3>
+                    <div id="predictionSummary" class="table-container"></div>
+                </div>
+                <div class="stats-card">
+                    <h3>Feature Statistics</h3>
+                    <div id="featureStats" class="table-container"></div>
+                </div>
+                <div class="stats-card">
+                    <h3>Detailed Results</h3>
+                    <div id="detailedResults" class="table-container"></div>
+                    <button id="exportCSV" style="margin-top: 25px;">Export Results to CSV</button>
+                </div>
+            </div>
+
+            <div class="visualization-container">
+                <div class="chart-container">
+                    <div id="predictionChart"></div>
+                </div>
+                <div class="chart-container">
+                    <div id="distributionChart"></div>
+                </div>
+                <div class="chart-container">
+                    <div id="correlationChart"></div>
+                </div>
+                <div class="chart-container">
+                    <div id="predictionBarChart"></div>
+                </div>
+                <div class="chart-container">
+                    <div id="confidenceScatterChart"></div>
+                </div>
+                <div class="chart-container">
+                    <div id="featureTrendChart"></div>
+                </div>
+                <div class="chart-container">
+                    <div id="relationshipChart"></div>
+                </div>
+                <div class="chart-container">
+                    <div id="predictionHeatmap"></div>
+                </div>
+                <div class="chart-container">
+                    <div id="featureBoxPlot"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let inputData = null;
+
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const button = document.getElementById('analyzeFileBtn');
+            toggleButtonState(button, true);
+            await submitForm(e.target, true);
+            toggleButtonState(button, false);
+        });
+
+        document.getElementById('manualForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const button = document.getElementById('analyzeDataBtn');
+            toggleButtonState(button, true);
+            await submitForm(e.target, false);
+            toggleButtonState(button, false);
+        });
+
+        async function submitForm(form, isFileUpload) {
+            showLoading(true);
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    inputData = result.input_data;
+                    await displayResults(result);
+                    showMessage('Analysis completed successfully', 'success');
+                } else {
+                    showMessage(result.error || 'Analysis failed', 'error');
+                }
+            } catch (error) {
+                showMessage(`Error: ${error.message}`, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function toggleButtonState(button, isProcessing) {
+            if (isProcessing) {
+                button.disabled = true;
+                button.classList.add('processing');
+                button.textContent = 'Analyzing...';
+            } else {
+                button.disabled = false;
+                button.classList.remove('processing');
+                button.textContent = button.id === 'analyzeFileBtn' ? 'Analyze File' : 'Analyze Data';
+            }
+        }
+
+        async function displayResults(data) {
+            document.querySelector('.results-section').style.display = 'block';
+            showProgress(true);
+            let progress = 0;
+            const totalSteps = 4 + 9; // 4 display functions + 9 charts
+            const increment = 100 / totalSteps;
+
+            updateProgress(progress += increment, 'Rendering Prediction Summary...');
+            displayPredictionSummary(data.predictions);
+
+            updateProgress(progress += increment, 'Rendering Feature Statistics...');
+            displayFeatureStats(data.data_analysis.basic_stats);
+
+            updateProgress(progress += increment, 'Rendering Detailed Results...');
+            displayDetailedResults(data.predictions);
+
+            updateProgress(progress += increment, 'Preparing Visualizations...');
+            await createVisualizationCharts(data, increment);
+
+            updateProgress(100, 'Results Rendered');
+            setTimeout(() => showProgress(false), 1000); // Hide progress bar after 1s
+            window.predictionData = data.predictions;
+        }
+
+        function displayPredictionSummary(predictions) {
+            const summaryDiv = document.getElementById('predictionSummary');
+            summaryDiv.innerHTML = '';
+
+            Object.entries(predictions).forEach(([type, data]) => {
+                const summary = data.predictions.reduce((acc, pred) => {
+                    acc[pred.label] = (acc[pred.label] || { count: 0, totalConfidence: 0 });
+                    acc[pred.label].count++;
+                    acc[pred.label].totalConfidence += pred.confidence;
+                    return acc;
+                }, {});
+
+                let blockHtml = `<h4>${type.charAt(0).toUpperCase() + type.slice(1)}</h4>`;
+                blockHtml += '<div class="pivot-block">';
+                Object.entries(summary).forEach(([label, stats]) => {
+                    const avgConfidence = stats.totalConfidence / stats.count;
+                    blockHtml += `
+                        <div class="feature-block">
+                            <h4>${label}</h4>
+                            <p><strong>Count:</strong> ${stats.count}</p>
+                            <p><strong>Avg. Confidence:</strong> ${(avgConfidence * 100).toFixed(2)}%</p>
+                        </div>
+                    `;
+                });
+                blockHtml += '</div>';
+                summaryDiv.innerHTML += blockHtml;
+            });
+        }
+
+        function displayFeatureStats(stats) {
+            const statsDiv = document.getElementById('featureStats');
+            statsDiv.innerHTML = '<div class="pivot-block">';
+
+            Object.entries(stats).forEach(([feature, values]) => {
+                statsDiv.innerHTML += `
+                    <div class="feature-row">
+                        <div class="feature-block">
+                            <h4>${feature}</h4>
+                            <p><strong>Mean:</strong> ${values.mean.toFixed(4)}</p>
+                            <p><strong>Min:</strong> ${values.min.toFixed(4)}</p>
+                        </div>
+                        <div class="feature-block">
+                            <h4>${feature} (cont.)</h4>
+                            <p><strong>Max:</strong> ${values.max.toFixed(4)}</p>
+                            <p><strong>Median:</strong> ${values.median.toFixed(4)}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            statsDiv.innerHTML += '</div>';
+        }
+
+        function displayDetailedResults(predictions) {
+            const resultsDiv = document.getElementById('detailedResults');
+            resultsDiv.innerHTML = '<div class="pivot-block">';
+
+            const numRows = predictions['category'].predictions.length;
+            const types = Object.keys(predictions);
+
+            for (let i = 0; i < numRows; i++) {
+                const category = predictions['category'].predictions[i];
+                const label = predictions['label'].predictions[i];
+                const subcategory = predictions['subcategory'].predictions[i];
+
+                resultsDiv.innerHTML += `
+                    <div class="result-row">
+                        <div class="result-block">
+                            <h4>Row ${i + 1}</h4>
+                            <p><strong>Category Prediction:</strong> ${category.label}</p>
+                            <p><strong>Category Confidence:</strong> ${(category.confidence * 100).toFixed(2)}%</p>
+                            <p><strong>Label Prediction:</strong> ${label.label}</p>
+                            <p><strong>Label Confidence:</strong> ${(label.confidence * 100).toFixed(2)}%</p>
+                        </div>
+                        <div class="result-block">
+                            <h4>Row ${i + 1} (cont.)</h4>
+                            <p><strong>Subcategory Prediction:</strong> ${subcategory.label}</p>
+                            <p><strong>Subcategory Confidence:</strong> ${(subcategory.confidence * 100).toFixed(2)}%</p>
+                        </div>
+                    </div>
+                `;
+            }
+            resultsDiv.innerHTML += '</div>';
+
+            document.getElementById('exportCSV').addEventListener('click', () => exportToCSV(window.predictionData, inputData));
+        }
+
+        async function createVisualizationCharts(data, increment) {
+            let progress = (100 / 13) * 4; // Starting after initial 4 steps
+            const chartIncrement = increment;
+
+            updateProgress(progress += chartIncrement, 'Rendering Prediction Chart...');
+            const predictionData = Object.entries(data.predictions).flatMap(([type, pred]) =>
+                pred.predictions.map(p => ({ label: `${type}: ${p.label}`, value: p.confidence }))
+            );
+            await Plotly.newPlot('predictionChart', [{
+                values: predictionData.map(d => d.value),
+                labels: predictionData.map(d => d.label),
+                type: 'pie',
+                textinfo: 'label+percent',
+                hoverinfo: 'label+percent+value',
+                marker: { colors: ['#1e88e5', '#42a5f5', '#90caf9', '#bbdefb'] }
+            }], {
+                title: { text: 'Prediction Confidence Distribution', font: { color: '#333', size: 16, family: 'Roboto' } },
+                height: 450,
+                paper_bgcolor: 'transparent',
+                plot_bgcolor: 'transparent',
+                font: { color: '#333' }
+            });
+
+            if (data.data_analysis?.feature_distributions) {
+                updateProgress(progress += chartIncrement, 'Rendering Distribution Chart...');
+                await Plotly.newPlot('distributionChart',
+                    data.data_analysis.feature_distributions.map(dist => ({
+                        x: dist.data,
+                        type: 'histogram',
+                        name: dist.feature,
+                        opacity: 0.8,
+                        marker: { line: { width: 2, color: '#888' }, color: '#42a5f5' }
+                    })), {
+                        title: { text: 'Feature Distributions', font: { color: '#333', size: 16, family: 'Roboto' } },
+                        barmode: 'overlay',
+                        bargap: 0.1,
+                        xaxis: { title: 'Value', color: '#333', titlefont: { size: 14 } },
+                        yaxis: { title: 'Count', color: '#333', titlefont: { size: 14 } },
+                        height: 450,
+                        paper_bgcolor: 'transparent',
+                        plot_bgcolor: 'transparent',
+                        font: { color: '#333', size: 12 }
+                    });
+            }
+
+            if (data.data_analysis?.correlation_matrix) {
+                updateProgress(progress += chartIncrement, 'Rendering Correlation Chart...');
+                await Plotly.newPlot('correlationChart', [{
+                    z: data.data_analysis.correlation_matrix,
+                    x: ['Src_Port', 'Dst_Port', 'Protocol', 'Flow_IAT_Mean', 'Flow_IAT_Min', 'Bwd_IAT_Mean', 'Bwd_IAT_Min', 'Pkt_Len_Max', 'SYN_Flag_Cnt', 'ACK_Flag_Cnt'],
+                    y: ['Src_Port', 'Dst_Port', 'Protocol', 'Flow_IAT_Mean', 'Flow_IAT_Min', 'Bwd_IAT_Mean', 'Bwd_IAT_Min', 'Pkt_Len_Max', 'SYN_Flag_Cnt', 'ACK_Flag_Cnt'],
+                    type: 'heatmap',
+                    colorscale: 'RdBu',
+                    showscale: true,
+                    zmin: -1,
+                    zmax: 1,
+                    colorbar: { title: 'Correlation', titlefont: { color: '#333', size: 14 } }
+                }], {
+                    title: { text: 'Feature Correlations', font: { color: '#333', size: 16, family: 'Roboto' } },
+                    xaxis: { tickangle: 45, color: '#333', titlefont: { size: 14 } },
+                    yaxis: { tickangle: 45, color: '#333', titlefont: { size: 14 } },
+                    height: 450,
+                    paper_bgcolor: 'transparent',
+                    plot_bgcolor: 'transparent',
+                    font: { color: '#333', size: 12 }
+                });
+            }
+
+            updateProgress(progress += chartIncrement, 'Rendering Prediction Bar Chart...');
+            const predictionCounts = Object.entries(data.predictions).map(([type, pred]) => {
+                const counts = pred.predictions.reduce((acc, p) => {
+                    acc[p.label] = (acc[p.label] || 0) + 1;
+                    return acc;
+                }, {});
+                return { type, counts };
+            });
+            await Plotly.newPlot('predictionBarChart', predictionCounts.map(pc => ({
+                x: Object.keys(pc.counts),
+                y: Object.values(pc.counts),
+                type: 'bar',
+                name: pc.type,
+                marker: { color: '#1e88e5' }
+            })), {
+                title: { text: 'Prediction Counts by Category', font: { color: '#333', size: 16, family: 'Roboto' } },
+                barmode: 'group',
+                xaxis: { title: 'Prediction Labels', tickangle: 45, color: '#333', titlefont: { size: 14 } },
+                yaxis: { title: 'Count', color: '#333', titlefont: { size: 14 } },
+                height: 450,
+                paper_bgcolor: 'transparent',
+                plot_bgcolor: 'transparent',
+                font: { color: '#333', size: 12 }
+            });
+
+            updateProgress(progress += chartIncrement, 'Rendering Confidence Scatter Chart...');
+            const confidenceData = Object.entries(data.predictions).map(([type, pred]) => ({
+                x: pred.predictions.map((_, i) => i + 1),
+                y: pred.predictions.map(p => p.confidence),
+                mode: 'markers+lines',
+                type: 'scatter',
+                name: type,
+                marker: { size: 10, color: '#1e88e5' },
+                line: { width: 2, color: '#1e88e5' }
+            }));
+            await Plotly.newPlot('confidenceScatterChart', confidenceData, {
+                title: { text: 'Prediction Confidence Scores', font: { color: '#333', size: 16, family: 'Roboto' } },
+                xaxis: { title: 'Sample Index', color: '#333', titlefont: { size: 14 } },
+                yaxis: { title: 'Confidence', range: [0, 1], color: '#333', titlefont: { size: 14 } },
+                height: 450,
+                paper_bgcolor: 'transparent',
+                plot_bgcolor: 'transparent',
+                font: { color: '#333', size: 12 }
+            });
+
+            if (data.data_analysis?.feature_distributions) {
+                updateProgress(progress += chartIncrement, 'Rendering Feature Trend Chart...');
+                await Plotly.newPlot('featureTrendChart',
+                    data.data_analysis.feature_distributions.map(dist => ({
+                        x: dist.data.map((_, i) => i + 1),
+                        y: dist.data,
+                        type: 'scatter',
+                        mode: 'lines+markers',
+                        name: dist.feature,
+                        line: { width: 2, color: '#1e88e5' },
+                        marker: { size: 6, color: '#1e88e5' }
+                    })), {
+                        title: { text: 'Feature Trends Over Samples', font: { color: '#333', size: 16, family: 'Roboto' } },
+                        xaxis: { title: 'Sample Index', color: '#333', titlefont: { size: 14 } },
+                        yaxis: { title: 'Value', color: '#333', titlefont: { size: 14 } },
+                        height: 450,
+                        paper_bgcolor: 'transparent',
+                        plot_bgcolor: 'transparent',
+                        font: { color: '#333', size: 12 }
+                    });
+            }
+
+            if (data.input_data) {
+                updateProgress(progress += chartIncrement, 'Rendering Relationship Chart...');
+                const scatterMatrixData = [
+                    { x: data.input_data['Src_Port'], y: data.input_data['Dst_Port'], mode: 'markers', name: 'Src vs Dst Port', marker: { color: '#1e88e5', size: 8, opacity: 0.7 } },
+                    { x: data.input_data['Flow_IAT_Mean'], y: data.input_data['Pkt_Len_Max'], mode: 'markers', name: 'Flow IAT vs Pkt Len', marker: { color: '#42a5f5', size: 8, opacity: 0.7 } }
+                ];
+                await Plotly.newPlot('relationshipChart', scatterMatrixData, {
+                    title: { text: 'Feature Relationship Analysis', font: { color: '#333', size: 16, family: 'Roboto' } },
+                    xaxis: { title: 'X Value', color: '#333', titlefont: { size: 14 } },
+                    yaxis: { title: 'Y Value', color: '#333', titlefont: { size: 14 } },
+                    height: 450,
+                    paper_bgcolor: 'transparent',
+                    plot_bgcolor: 'transparent',
+                    font: { color: '#333', size: 12 }
+                });
+            }
+
+            updateProgress(progress += chartIncrement, 'Rendering Prediction Heatmap...');
+            const predTypes = Object.keys(data.predictions);
+            const heatmapZ = predTypes.map(type =>
+                data.predictions[type].predictions.map(p => p.confidence)
+            );
+            await Plotly.newPlot('predictionHeatmap', [{
+                z: heatmapZ,
+                x: data.predictions[predTypes[0]].predictions.map((_, i) => i + 1),
+                y: predTypes,
+                type: 'heatmap',
+                colorscale: 'Viridis',
+                showscale: true,
+                zmin: 0,
+                zmax: 1,
+                colorbar: { title: 'Confidence', titlefont: { color: '#333', size: 14 } }
+            }], {
+                title: { text: 'Prediction Confidence Heatmap', font: { color: '#333', size: 16, family: 'Roboto' } },
+                xaxis: { title: 'Sample Index', color: '#333', titlefont: { size: 14 } },
+                yaxis: { title: 'Prediction Type', color: '#333', titlefont: { size: 14 } },
+                height: 450,
+                paper_bgcolor: 'transparent',
+                plot_bgcolor: 'transparent',
+                font: { color: '#333', size: 12 }
+            });
+
+            if (data.data_analysis?.feature_distributions) {
+                updateProgress(progress += chartIncrement, 'Rendering Feature Box Plot...');
+                await Plotly.newPlot('featureBoxPlot',
+                    data.data_analysis.feature_distributions.map(dist => ({
+                        y: dist.data,
+                        type: 'box',
+                        name: dist.feature,
+                        boxpoints: 'outliers',
+                        marker: { color: '#1e88e5' }
+                    })), {
+                        title: { text: 'Feature Distribution Box Plots', font: { color: '#333', size: 16, family: 'Roboto' } },
+                        yaxis: { title: 'Value', color: '#333', titlefont: { size: 14 } },
+                        height: 450,
+                        paper_bgcolor: 'transparent',
+                        plot_bgcolor: 'transparent',
+                        font: { color: '#333', size: 12 }
+                    });
+            }
+        }
+
+        function showLoading(show) {
+            document.querySelector('.loading').style.display = show ? 'block' : 'none';
+        }
+
+        function showProgress(show) {
+            document.getElementById('progressContainer').style.display = show ? 'block' : 'none';
+        }
+
+        function updateProgress(percentage, message) {
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            progressFill.style.width = `${percentage}%`;
+            progressText.textContent = `${message}: ${Math.round(percentage)}%`;
+        }
+
+        function showMessage(message, type) {
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML = `<div class="${type}-message">${message}</div>`;
+        }
+
+        function exportToCSV(predictions, inputData) {
+            let csvContent = "data:text/csv;charset=utf-8,";
+            const rows = [];
+
+            const inputHeaders = Object.keys(inputData || {});
+            const predHeaders = Object.keys(predictions).flatMap(type => [`${type}_Prediction`, `${type}_Confidence`]);
+            rows.push([...inputHeaders, ...predHeaders].join(","));
+
+            const numRows = Object.values(predictions)[0].predictions.length;
+            for (let i = 0; i < numRows; i++) {
+                const inputRow = inputHeaders.map(h => inputData[h][i] || 0);
+                const predRow = Object.entries(predictions).flatMap(([type, data]) => [
+                    `"${data.predictions[i].label}"`, data.predictions[i].confidence
+                ]);
+                rows.push([...inputRow, ...predRow].join(","));
+            }
+
+            csvContent += rows.join("\n");
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "network_traffic_analysis_results.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>

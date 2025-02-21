@@ -1,0 +1,22 @@
+project/
+├── app.py                # FastAPI application
+├── Dockerfile            # Dockerfile
+├── requirements.txt      # Dependencies
+├── templates/
+│   └── index.html        # Your existing HTML template
+├── Models/
+│   ├── Label_Models/
+│   │   └── randomforest_label.pkl
+│   ├── Cat_Models/
+│   │   └── randomforest_Cat.pkl
+│   └── Sub_Cat_Models/
+│       └── randomforest_Sub_Cat.pkl
+├── uploads/              # Created at runtime
+└── results/              # Created at runtime
+fastapi==0.103.0
+uvicorn==0.23.2
+jinja2==3.1.2
+pandas==2.0.3
+numpy==1.24.3
+joblib==1.3.2
+scikit-learn==1.3.0

@@ -1,0 +1,118 @@
+2025-02-08 01:56:15,035 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-02-08 01:56:15,036 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-02-08 01:56:41,064 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-02-08 01:56:41,064 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-02-08 01:56:54,066 - werkzeug - INFO - 127.0.0.1 - - [08/Feb/2025 01:56:54] "GET / HTTP/1.1" 200 -
+2025-02-08 01:57:24,402 - __main__ - ERROR - Error processing predictions for category: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- Bwd_IAT_Mean
+- Bwd_IAT_Min
+- Flow_IAT_Mean
+- Flow_IAT_Min
+- Pkt_Len_Max
+- ...
+Feature names seen at fit time, yet now missing:
+- Bwd_Pkt_Len_Mean
+- Bwd_Pkt_Len_Min
+- Bwd_Seg_Size_Avg
+- Fwd_Seg_Size_Avg
+- Pkt_Len_Std
+- ...
+
+2025-02-08 01:57:24,403 - __main__ - ERROR - Error processing predictions for subcategory: The feature names should match those that were passed during fit.
+Feature names seen at fit time, yet now missing:
+- Bwd_Header_Len
+- Bwd_IAT_Max
+- Bwd_IAT_Std
+- Bwd_IAT_Tot
+- Bwd_PSH_Flags
+- ...
+
+2025-02-08 01:57:24,420 - werkzeug - INFO - 127.0.0.1 - - [08/Feb/2025 01:57:24] "POST /predict HTTP/1.1" 200 -
+2025-02-08 01:57:52,942 - werkzeug - INFO - 127.0.0.1 - - [08/Feb/2025 01:57:52] "POST /predict HTTP/1.1" 200 -
+2025-02-08 01:58:16,906 - werkzeug - INFO - 127.0.0.1 - - [08/Feb/2025 01:58:16] "GET / HTTP/1.1" 200 -
+2025-02-08 01:58:18,637 - werkzeug - INFO - 127.0.0.1 - - [08/Feb/2025 01:58:18] "GET / HTTP/1.1" 200 -
+2025-02-08 01:58:33,322 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-02-08 01:58:33,323 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-02-08 01:58:37,194 - werkzeug - INFO - 127.0.0.1 - - [08/Feb/2025 01:58:37] "GET / HTTP/1.1" 200 -
+2025-02-08 01:58:49,659 - __main__ - ERROR - Error processing predictions for category: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- Bwd_IAT_Mean
+- Bwd_IAT_Min
+- Flow_IAT_Mean
+- Flow_IAT_Min
+- Pkt_Len_Max
+- ...
+Feature names seen at fit time, yet now missing:
+- Bwd_Pkt_Len_Mean
+- Bwd_Pkt_Len_Min
+- Bwd_Seg_Size_Avg
+- Fwd_Seg_Size_Avg
+- Pkt_Len_Std
+- ...
+
+2025-02-08 01:58:49,660 - __main__ - ERROR - Error processing predictions for subcategory: The feature names should match those that were passed during fit.
+Feature names seen at fit time, yet now missing:
+- Bwd_Header_Len
+- Bwd_IAT_Max
+- Bwd_IAT_Std
+- Bwd_IAT_Tot
+- Bwd_PSH_Flags
+- ...
+
+2025-02-08 01:58:49,674 - werkzeug - INFO - 127.0.0.1 - - [08/Feb/2025 01:58:49] "POST /predict HTTP/1.1" 200 -
+2025-02-08 01:58:56,403 - __main__ - ERROR - Error processing predictions for category: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- Bwd_IAT_Mean
+- Bwd_IAT_Min
+- Flow_IAT_Mean
+- Flow_IAT_Min
+- Pkt_Len_Max
+- ...
+Feature names seen at fit time, yet now missing:
+- Bwd_Pkt_Len_Mean
+- Bwd_Pkt_Len_Min
+- Bwd_Seg_Size_Avg
+- Fwd_Seg_Size_Avg
+- Pkt_Len_Std
+- ...
+
+2025-02-08 01:58:56,404 - __main__ - ERROR - Error processing predictions for subcategory: The feature names should match those that were passed during fit.
+Feature names seen at fit time, yet now missing:
+- Bwd_Header_Len
+- Bwd_IAT_Max
+- Bwd_IAT_Std
+- Bwd_IAT_Tot
+- Bwd_PSH_Flags
+- ...
+
+2025-02-08 01:58:56,415 - werkzeug - INFO - 127.0.0.1 - - [08/Feb/2025 01:58:56] "POST /predict HTTP/1.1" 200 -
+2025-02-08 01:59:12,069 - __main__ - ERROR - Error processing predictions for category: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- Bwd_IAT_Mean
+- Bwd_IAT_Min
+- Flow_IAT_Mean
+- Flow_IAT_Min
+- Pkt_Len_Max
+- ...
+Feature names seen at fit time, yet now missing:
+- Bwd_Pkt_Len_Mean
+- Bwd_Pkt_Len_Min
+- Bwd_Seg_Size_Avg
+- Fwd_Seg_Size_Avg
+- Pkt_Len_Std
+- ...
+
+2025-02-08 01:59:12,070 - __main__ - ERROR - Error processing predictions for subcategory: The feature names should match those that were passed during fit.
+Feature names seen at fit time, yet now missing:
+- Bwd_Header_Len
+- Bwd_IAT_Max
+- Bwd_IAT_Std
+- Bwd_IAT_Tot
+- Bwd_PSH_Flags
+- ...
+
+2025-02-08 01:59:12,075 - werkzeug - INFO - 127.0.0.1 - - [08/Feb/2025 01:59:12] "POST /predict HTTP/1.1" 200 -
